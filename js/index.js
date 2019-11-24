@@ -15,21 +15,18 @@ var grid = [];
 for(var i = 0; i < 4; i++){
 	grid.push([]);
 	for(var j = 0; j < 4; j++){
-		grid[i].push(new Tile(2048));
+		grid[i].push(new Tile(1));
 	}
 }
 // render the tiles to grid
 function render(){
-	const ground = $('#ground');
+	const $tiles = $('#tiles');
 	for(var i = 0; i < 4; i++){
-		var $row = ground.children().eq(i)
 		for(var j = 0; j < 4; j++){
-			debugger;
-			var $grid = $row.children().eq(j);
 			var tile = grid[i][j];
-			$grid.append(tileTemplate.clone()
+			$tiles.append(tileTemplate.clone()
 				.text(tile.n !== 1 ? tile.n : '')
-				.addClass(`t${tile.n}`));
+				.addClass(`n${tile.n}`));
 		}
 	}
 }

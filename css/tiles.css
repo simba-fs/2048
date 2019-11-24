@@ -1,0 +1,46 @@
+#tiles{
+	position: absolute;
+	z-index: 1;
+}
+
+#tiles * {
+	position: relative;
+	height: 100px;
+	width: 100px;
+}
+
+/* row */
+
+.r0 {
+  top: 20px;
+}
+
+.r1 {
+  top: 140px;
+}
+
+.r2 {
+  top: 260px;
+}
+
+.r3 {
+  top: 380px;
+}
+
+/* col */
+
+.c0 {
+  left: 20px; 
+}
+
+.c1 {
+  left: 140px; 
+}
+
+.c2 {
+  left: 260px; 
+}
+
+.c3 {
+  left: 380px; 
+}
