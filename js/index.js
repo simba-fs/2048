@@ -1,6 +1,7 @@
 console.log('index.js loaded');
-const tileTemplate = $('<div class="tile"></div').text(2);
-i
+
+var grid = [];
+
 // define Tile class
 class Tile{
 	constructor(n = 1){
@@ -8,18 +9,38 @@ class Tile{
 	}
 }
 
-//init grid
-
-var grid = [];
-
-for(var i = 0; i < 4; i++){
-	grid.push([]);
-	for(var j = 0; j < 4; j++){
-		grid[i].push(new Tile(2));
+function initGrid(){
+	grid.length = 0;
+	for(var i = 0; i < 4; i++){
+		grid.push([]);
+		for(var j = 0; j < 4; j++){
+			grid[i].push(new Tile(1));
+		}
 	}
 }
+
+function newTile(n = 2){
+	var random = (n = 4) => Math.floor(Math.random()*n);
+	var r = random();
+	var c = random();
+	while(grid[r][c].n !== 1){
+		r = random();
+		c = random();
+	}
+	console.log(r, c);
+	grid[r][c].n = n;
+}
+
+function newGame(){
+	initGrid();
+	newTile(Math.random() > 0.8 ? 4 : 2);
+	newTile(Math.random() > 0.8 ? 4 : 2);
+	render();
+}
+
 // render tiles to grid
 function render(){
+	const tileTemplate = $('<div class="tile"></div').text(2);
 	const $tiles = $('#tiles');
 	for(var i = 0; i < 4; i++){
 		for(var j = 0; j < 4; j++){
@@ -31,33 +52,130 @@ function render(){
 	}
 }
 
+//move
+
 function up(){
+	var flag = true;
 	for(var r = 0; r < 4; r++){
 		for(var c = 0; c < 4; c++){		
 			console.log('scan', r, c);
 			if(grid[r][c].n === 1) continue;
 			if(r < 3 && grid[r][c].n === grid[r+1][c].n){
-				console.log('combine', r , c);
 				grid[r][c].n *= 2;
 				grid[r+1][c].n = 1;
-				continue;
+				flag = false;
+				console.log('combine', r , c, flag);
 			}
 			if(r > 0 && r < 4 && grid[r-1][c].n === 1){
 				let next = r-1;
-				while(next > 1 && grid[next-1][c] === 1) next--;
+				while(next >= 1 && grid[next-1][c].n === 1) next--;
 				grid[next][c].n = grid[r][c].n;
 				grid[r][c].n = 1;
-				console.log('move up', r, c, next, c);
-				continue;
+				flag = false;
+				console.log('move up', r, c, next, c, flag);
 			}
-			
 		}
 	}
+	flag || newTile();
 	render();
 }
 
+function down(){
+	var flag = true;
+	for(var r = 3; r >= 0; r--){
+		for(var c = 0; c < 4; c++){		
+			console.log('scan', r, c);
+			if(grid[r][c].n === 1) continue;
+			if(r > 0 && grid[r][c].n === grid[r-1][c].n){
+				grid[r][c].n *= 2;
+				grid[r-1][c].n = 1;
+				flag = false;
+				console.log('combine', r , c, flag);
+			}
+			if(r >= 0 && r <= 2 && grid[r+1][c].n === 1){
+				let next = r+1;
+				while(next <= 2 && grid[next+1][c].n === 1) next++;
+				grid[next][c].n = grid[r][c].n;
+				grid[r][c].n = 1;
+				flag = false;
+				console.log('move down', r, c, next, c, flag);
+			}
+		}
+	}
+	flag || newTile();
+	render();
+}
+
+function left(){
+	var flag = true;
+	for(var c = 0; c < 4; c++){		
+		for(var r = 0; r < 4; r++){
+			console.log('scan', r, c);
+			if(grid[r][c].n === 1) continue;
+			if(c < 3 && grid[r][c].n === grid[r][c+1].n){
+				grid[r][c].n *= 2;
+				grid[r][c+1].n = 1;
+				flag = false;
+				console.log('combine', r , c, flag);
+			}
+			if(c > 0 && c < 4 && grid[r][c-1].n === 1){
+				let next = c-1;
+				while(next >= 1 && grid[r][next-1].n === 1) next--;
+				grid[r][next].n = grid[r][c].n;
+				grid[r][c].n = 1;
+				flag = false;
+				console.log('left up', r, c, r, next, flag);
+			}
+		}
+	}
+	flag || newTile();
+	render();
+}
+
+function right(){
+	var flag = true;
+	for(var c = 3; c >= 0; c--){		
+		for(var r = 0; r < 4; r++){
+			console.log('scan', r, c);
+			if(grid[r][c].n === 1) continue;
+			if(c > 0 && grid[r][c].n === grid[r][c-1].n){
+				grid[r][c].n *= 2;
+				grid[r][c-1].n = 1;
+				flag = false;
+				console.log('combine', r , c, flag);
+			}
+			if(c >= 0 && c <= 2 && grid[r][c+1].n === 1){
+				let next = c+1;
+				while(next <= 2 && grid[r][next+1].n === 1) next++;
+				grid[r][next].n = grid[r][c].n;
+				grid[r][c].n = 1;
+				flag = false;
+				console.log('move right', r, c, r, next, flag);
+			}
+		}
+	}
+	flag || newTile();
+	render();
+}
+
+function init(){
+	newGame();
+	
+	// bind key event
+	
+	$(document)
+		.bind('keydown', 'up', up)
+		.bind('keydown', 'down', down)
+		.bind('keydown', 'left', left)
+		.bind('keydown', 'right', right);
+}
+
+init();
+
 // test code
 
+/*
 grid[1][0].n = 2;
 grid[3][0].n = 2;
 render();
+*/
