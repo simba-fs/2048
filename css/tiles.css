@@ -4,9 +4,10 @@
 }
 
 #tiles * {
-	position: relative;
+	position: absolute;
 	height: 100px;
 	width: 100px;
+  transform: translate(0px, 0px);
 }
 
 /* row */
