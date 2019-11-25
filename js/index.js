@@ -40,16 +40,9 @@ function newGame(){
 
 // render tiles to grid
 function render(){
-	const tileTemplate = $('<div class="tile"></div').text(2);
-	const $tiles = $('#tiles');
-	for(var i = 0; i < 4; i++){
-		for(var j = 0; j < 4; j++){
-			var tile = grid[i][j];
-			$tiles.append(tileTemplate.clone()
-				.text(tile.n !== 1 ? tile.n : '')
-				.addClass(`n${tile.n} r${i} c${j}`));
-		}
-	}
+	$('#tiles').each((item) => {
+
+	});
 }
 
 //move
@@ -161,6 +154,17 @@ function right(){
 function init(){
 	newGame();
 	
+	const tileTemplate = $('<div class="tile"></div').text(2);
+	const $tiles = $('#tiles');
+	for(var i = 0; i < 4; i++){
+		for(var j = 0; j < 4; j++){
+			var tile = grid[i][j];
+			$tiles.append(tileTemplate.clone()
+				.text(tile.n !== 1 ? tile.n : '')
+				.addClass(`n${tile.n} r${i} c${j}`));
+		}
+	}
+
 	// bind key event
 	
 	$(document)
