@@ -1,5 +1,5 @@
 console.log('index.js loaded');
-
+console.log = () => {};
 var grid = [];
 
 // define Tile class
@@ -40,8 +40,19 @@ function newGame(){
 
 // render tiles to grid
 function render(){
-	$('#tiles').each((item) => {
-
+	$('#tiles').children().each((index, item) => {
+		// get row and col
+		const $item = $(item);
+		const cla = $item.attr('class').split(' ');
+		const r = cla.filter((i) => i.charAt(0)=='r')[0].substr(1);
+		const c = cla.filter((i) => i.charAt(0)=='c')[0].substr(1);
+		const n = cla.filter((i) => i.charAt(0)=='n')[0].substr(1);
+		if(grid[r][c].n !== n){
+			$item
+				.removeClass(`n${n}`)
+				.addClass(`n${grid[r][c].n}`)
+				.text(grid[r][c].n === 1 ? '' : grid[r][c].n);
+		}
 	});
 }
 
