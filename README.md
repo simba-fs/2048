@@ -5,3 +5,5 @@
 
 # TODO
 1. animation
+2. gameover test & alert
+3. fix a problem about move and merge
