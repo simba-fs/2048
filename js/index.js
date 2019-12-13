@@ -1,5 +1,5 @@
 console.log('index.js loaded');
-console.log = () => {};
+//console.log = () => {};
 var grid = [];
 
 // define Tile class
@@ -19,10 +19,10 @@ function initGrid(){
 	}
 }
 
-function newTile(n = 2){
+function newTile(n = 2, r, c){
 	var random = (n = 4) => Math.floor(Math.random()*n);
-	var r = random();
-	var c = random();
+	if(r === undefined) r = random();
+	if(c === undefined) c = random();
 	while(grid[r][c].n !== 1){
 		r = random();
 		c = random();
@@ -33,8 +33,8 @@ function newTile(n = 2){
 
 function newGame(){
 	initGrid();
-	newTile(Math.random() > 0.8 ? 4 : 2);
-	newTile(Math.random() > 0.8 ? 4 : 2);
+	newTile(Math.random() > 0.8 ? 4 : 2, 0, 0);
+	newTile(Math.random() > 0.8 ? 4 : 2, 0, 2);
 	render();
 }
 
@@ -56,6 +56,20 @@ function render(){
 	});
 }
 
+function merge(a){
+	// move
+	for(var i in a){
+		if(i === 0) continue;
+
+		var next = i - 1;
+		while(next >= 1 && a[next].n == 1) next--;
+		console.log(i, next);
+		a[i-1]= a[i];
+		a[i] = 1;
+		flag = true;
+	}
+}
+
 //move
 
 function up(){
@@ -64,12 +78,23 @@ function up(){
 		for(var c = 0; c < 4; c++){		
 			console.log('scan', r, c);
 			if(grid[r][c].n === 1) continue;
+			// move
+			if(r > 0 && r < 4 && grid[r-1][c].n === 1){
+				let next = r-1;
+				while(next >= 1 && grid[next-1][c].n === 1) next--;
+				grid[next][c].n = grid[r][c].n;
+				grid[r][c].n = 1;
+				flag = false;
+				console.log('move up', r, c, next, c, flag);
+			}
+			// merge
 			if(r < 3 && grid[r][c].n === grid[r+1][c].n){
 				grid[r][c].n *= 2;
 				grid[r+1][c].n = 1;
 				flag = false;
-				console.log('combine', r , c, flag);
+				console.log('merge', r , c, flag);
 			}
+			// move
 			if(r > 0 && r < 4 && grid[r-1][c].n === 1){
 				let next = r-1;
 				while(next >= 1 && grid[next-1][c].n === 1) next--;
@@ -90,12 +115,23 @@ function down(){
 		for(var c = 0; c < 4; c++){		
 			console.log('scan', r, c);
 			if(grid[r][c].n === 1) continue;
+			//move
+			if(r >= 0 && r <= 2 && grid[r+1][c].n === 1){
+				let next = r+1;
+				while(next <= 2 && grid[next+1][c].n === 1) next++;
+				grid[next][c].n = grid[r][c].n;
+				grid[r][c].n = 1;
+				flag = false;
+				console.log('move down', r, c, next, c, flag);
+			}
+			// merge
 			if(r > 0 && grid[r][c].n === grid[r-1][c].n){
 				grid[r][c].n *= 2;
 				grid[r-1][c].n = 1;
 				flag = false;
-				console.log('combine', r , c, flag);
+				console.log('merge', r , c, flag);
 			}
+			//move
 			if(r >= 0 && r <= 2 && grid[r+1][c].n === 1){
 				let next = r+1;
 				while(next <= 2 && grid[next+1][c].n === 1) next++;
@@ -116,12 +152,25 @@ function left(){
 		for(var r = 0; r < 4; r++){
 			console.log('scan', r, c);
 			if(grid[r][c].n === 1) continue;
+			// move
+			if(c > 0 && grid[r][c-1].n === 1){
+				let next = c-1;
+				while(next >= 1 && grid[r][next-1].n === 1) next--;
+				grid[r][next].n = grid[r][c].n;
+				grid[r][c].n = 1;
+				flag = false;
+				console.log('left up', r, c, r, next, flag);
+			}
+			console.log(grid);
+			// merge
 			if(c < 3 && grid[r][c].n === grid[r][c+1].n){
 				grid[r][c].n *= 2;
 				grid[r][c+1].n = 1;
 				flag = false;
-				console.log('combine', r , c, flag);
+				console.log('merge', r , c, flag);
 			}
+			console.log(grid);
+			// move
 			if(c > 0 && c < 4 && grid[r][c-1].n === 1){
 				let next = c-1;
 				while(next >= 1 && grid[r][next-1].n === 1) next--;
@@ -130,6 +179,7 @@ function left(){
 				flag = false;
 				console.log('left up', r, c, r, next, flag);
 			}
+			console.log(grid);
 		}
 	}
 	flag || newTile();
@@ -142,12 +192,23 @@ function right(){
 		for(var r = 0; r < 4; r++){
 			console.log('scan', r, c);
 			if(grid[r][c].n === 1) continue;
+			// move
+			if(c >= 0 && c <= 2 && grid[r][c+1].n === 1){
+				let next = c+1;
+				while(next <= 2 && grid[r][next+1].n === 1) next++;
+				grid[r][next].n = grid[r][c].n;
+				grid[r][c].n = 1;
+				flag = false;
+				console.log('move right', r, c, r, next, flag);
+			}
+			// merge
 			if(c > 0 && grid[r][c].n === grid[r][c-1].n){
 				grid[r][c].n *= 2;
 				grid[r][c-1].n = 1;
 				flag = false;
-				console.log('combine', r , c, flag);
+				console.log('merge', r , c, flag);
 			}
+			// move
 			if(c >= 0 && c <= 2 && grid[r][c+1].n === 1){
 				let next = c+1;
 				while(next <= 2 && grid[r][next+1].n === 1) next++;
