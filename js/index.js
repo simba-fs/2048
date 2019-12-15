@@ -1,5 +1,5 @@
 console.log('index.js loaded');
-//console.log = () => {};
+console.log = () => {};
 var grid = [];
 
 // define Tile class
