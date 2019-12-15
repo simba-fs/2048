@@ -1,6 +1,7 @@
 console.log('index.js loaded');
 console.log = () => {};
 var grid = [];
+var score = 0;
 
 // define Tile class
 class Tile{
@@ -33,6 +34,7 @@ function newGame(){
 	initGrid();
 	newTile(Math.random() > 0.8 ? 4 : 2);
 	newTile(Math.random() > 0.8 ? 4 : 2);
+	score = 0;
 	render();
 }
 
@@ -52,6 +54,7 @@ function render(){
 				.text(grid[r][c].n === 1 ? '' : grid[r][c].n);
 		}
 	});
+	$('#score').text(score);
 }
 
 function isEnd(){
@@ -100,17 +103,17 @@ function moveLine(line, reverse){
 	if(line[0].n === line[1].n && line[0].n > 1){
 		line[0].n *= 2;
 		line[1].n = 1;
-		// score += 2 ** line[1];
+		score += line[0].n;
 	}
 	if(line[1].n === line[2].n && line[1].n > 1){
 		line[1].n *= 2;
 		line[2].n = 1;
-		// score += 2 ** line[1];
+		score += line[0].n;
 	}
 	if(line[2].n === line[3].n && line[2].n > 1){
 		line[2].n *= 2;
 		line[3].n = 1;
-		// score += 2 ** line[2];
+		score += line[1].n;
 	}
 	for(let i = 1; i <= 2; i++){
 		if(line[i].n === 1){
