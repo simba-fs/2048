@@ -26,21 +26,7 @@ function newTile(n = 2, r, c){
 	var available =	[...grid].flat().filter((item)=>item.n === 1);
 	var result = available[random(available.length)];
 	if(!result) return;
-	console.log(result);
 	grid[result.r][result.c].n = n;
-	/*
-	var counter = 0;
-	if(r === undefined) r = random();
-	if(c === undefined) c = random();
-	while(grid[r][c].n !== 1 && counter <= 16){
-		r = random();
-		c = random();
-		counter ++;
-	}
-	if(counter >= 16) return alert('You lose');
-	console.log(counter, r, c, grid[r][c].n);
-	grid[r][c].n = n;
-	*/
 }
 
 function newGame(){
@@ -66,6 +52,34 @@ function render(){
 				.text(grid[r][c].n === 1 ? '' : grid[r][c].n);
 		}
 	});
+}
+
+function isEnd(){
+	end = true;
+	for(var i of [...grid].flat()){
+		var {r, c} = i;
+		if(r > 0 && (grid[r-1][c].n === i.n || grid[r-1][c].n === 1)){
+			console.log('End', r, c)
+			end = false;
+			break;
+		}
+		if(r < 3 && (grid[r+1][c].n === i.n || grid[r+1][c].n === 1)){
+			console.log('End', r, c)
+			end = false;
+			break;
+		}
+		if(c > 0 && (grid[r][c-1].n === i.n || grid[r][c-1].n === 1)){
+			console.log('End', r, c)
+			end = false;
+			break;
+		}
+		if(c < 3 && (grid[r][c+1].n === i.n || grid[r][c+1].n === 1)){
+			console.log('End', r, c)
+			end = false;
+			break;
+		}
+	}
+	return end;	
 }
 
 function moveLine(line, reverse){
@@ -131,15 +145,13 @@ function move(drc){
 			break;
 		case 3:
 			for(i in [1, 2, 3, 4]){
-				console.log('i: ', i);
-				console.log('before', [grid[i][0], grid[i][1], grid[i][2], grid[i][3]]);
-				console.log('after', moveLine([grid[i][0], grid[i][1], grid[i][2], grid[i][3]]));
 				[grid[i][0], grid[i][1], grid[i][2], grid[i][3]] = 
 					moveLine([grid[i][0], grid[i][1], grid[i][2], grid[i][3]],true);
 			}
 	}
 	newTile();
 	render();
+	if(isEnd()) alert('GAME OVER');
 }
 
 
