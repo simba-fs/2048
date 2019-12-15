@@ -4,8 +4,10 @@ var grid = [];
 
 // define Tile class
 class Tile{
-	constructor(n = 1){
+	constructor(n = 1, r = 0, c = 0){
 		this.n = Math.pow(2, Math.floor(Math.log2(n)));
+		this.r = r;
+		this.c = c;
 	}
 }
 
@@ -14,27 +16,37 @@ function initGrid(){
 	for(var i = 0; i < 4; i++){
 		grid.push([]);
 		for(var j = 0; j < 4; j++){
-			grid[i].push(new Tile(1));
+			grid[i].push(new Tile(1, i, j));
 		}
 	}
 }
 
 function newTile(n = 2, r, c){
 	var random = (n = 4) => Math.floor(Math.random()*n);
+	var available =	[...grid].flat().filter((item)=>item.n === 1);
+	var result = available[random(available.length)];
+	if(!result) return;
+	console.log(result);
+	grid[result.r][result.c].n = n;
+	/*
+	var counter = 0;
 	if(r === undefined) r = random();
 	if(c === undefined) c = random();
-	while(grid[r][c].n !== 1){
+	while(grid[r][c].n !== 1 && counter <= 16){
 		r = random();
 		c = random();
+		counter ++;
 	}
-	console.log(r, c);
+	if(counter >= 16) return alert('You lose');
+	console.log(counter, r, c, grid[r][c].n);
 	grid[r][c].n = n;
+	*/
 }
 
 function newGame(){
 	initGrid();
-	newTile(Math.random() > 0.8 ? 4 : 2, 0, 0);
-	newTile(Math.random() > 0.8 ? 4 : 2, 0, 2);
+	newTile(Math.random() > 0.8 ? 4 : 2);
+	newTile(Math.random() > 0.8 ? 4 : 2);
 	render();
 }
 
@@ -97,39 +109,39 @@ function moveLine(line, reverse){
 	return line;
 }
 
-function moveall(drc){
-	if(drc === 0){
-		for(i in [1, 2, 3, 4]){
-			[grid[0][i], grid[1][i], grid[2][i], grid[3][i]] = 
-				movealine([grid[0][i], grid[1][i], grid[2][i], grid[3][i]],false);
-		}
-		return;
+function move(drc){
+	switch(drc){
+		case 0: 
+			for(i in [1, 2, 3, 4]){
+				[grid[0][i], grid[1][i], grid[2][i], grid[3][i]] = 
+					moveLine([grid[0][i], grid[1][i], grid[2][i], grid[3][i]],false);
+			}
+			break;
+		case 1:
+			for(i in [1, 2, 3, 4]){
+				[grid[0][i], grid[1][i], grid[2][i], grid[3][i]] = 
+					moveLine([grid[0][i], grid[1][i], grid[2][i], grid[3][i]],true);
+			}
+			break;
+		case 2:
+			for(i in [1, 2, 3, 4]){
+				[grid[i][0], grid[i][1], grid[i][2], grid[i][3]] = 
+					moveLine([grid[i][0], grid[i][1], grid[i][2], grid[i][3]],false);
+			}
+			break;
+		case 3:
+			for(i in [1, 2, 3, 4]){
+				console.log('i: ', i);
+				console.log('before', [grid[i][0], grid[i][1], grid[i][2], grid[i][3]]);
+				console.log('after', moveLine([grid[i][0], grid[i][1], grid[i][2], grid[i][3]]));
+				[grid[i][0], grid[i][1], grid[i][2], grid[i][3]] = 
+					moveLine([grid[i][0], grid[i][1], grid[i][2], grid[i][3]],true);
+			}
 	}
-	if(drc === 1){
-		for(i in [1, 2, 3, 4]){
-			[grid[0][i], grid[1][i], grid[2][i], grid[3][i]] = 
-				movealine([grid[0][i], grid[1][i], grid[2][i], grid[3][i]],true);
-		}
-		return;
-	}
-	if(drc === 2){
-		for(i in [1, 2, 3, 4]){
-			[grid[i][0], grid[i][1], grid[i][2], grid[i][3]] = 
-				movealine([grid[i][0], grid[i][1], grid[i][2], grid[i][3]],false);
-		}
-		return;
-	}
-	if(drc === 3){
-		for(i in [1, 2, 3, 4]){
-			console.log('i: ', i);
-			console.log('before', [grid[i][0], grid[i][1], grid[i][2], grid[i][3]]);
-			console.log('after', movealine([grid[i][0], grid[i][1], grid[i][2], grid[i][3]]));
-			[grid[i][0], grid[i][1], grid[i][2], grid[i][3]] = 
-				movealine([grid[i][0], grid[i][1], grid[i][2], grid[i][3]],true);
-		}
-		return;
-	}
+	newTile();
+	render();
 }
+
 
 function init(){
 	newGame();
@@ -148,10 +160,10 @@ function init(){
 	// bind key event
 	
 	$(document)
-		.bind('keydown', 'up', up)
-		.bind('keydown', 'down', down)
-		.bind('keydown', 'left', left)
-		.bind('keydown', 'right', right);
+		.bind('keydown', 'up', ()=>{move(0)})
+		.bind('keydown', 'down', ()=>{move(1)})
+		.bind('keydown', 'left', ()=>{move(2)})
+		.bind('keydown', 'right', ()=>{move(3)});
 }
 
 init();
