@@ -56,171 +56,79 @@ function render(){
 	});
 }
 
-function merge(a){
-	// move
-	for(var i in a){
-		if(i === 0) continue;
-
-		var next = i - 1;
-		while(next >= 1 && a[next].n == 1) next--;
-		console.log(i, next);
-		a[i-1]= a[i];
-		a[i] = 1;
-		flag = true;
+function moveLine(line, reverse){
+	if(reverse){
+		line = [line[3], line[2], line[1], line[0]]; 
 	}
-}
-
-//move
-
-function up(){
-	var flag = true;
-	for(var r = 0; r < 4; r++){
-		for(var c = 0; c < 4; c++){		
-			console.log('scan', r, c);
-			if(grid[r][c].n === 1) continue;
-			// move
-			if(r > 0 && r < 4 && grid[r-1][c].n === 1){
-				let next = r-1;
-				while(next >= 1 && grid[next-1][c].n === 1) next--;
-				grid[next][c].n = grid[r][c].n;
-				grid[r][c].n = 1;
-				flag = false;
-				console.log('move up', r, c, next, c, flag);
-			}
-			// merge
-			if(r < 3 && grid[r][c].n === grid[r+1][c].n){
-				grid[r][c].n *= 2;
-				grid[r+1][c].n = 1;
-				flag = false;
-				console.log('merge', r , c, flag);
-			}
-			// move
-			if(r > 0 && r < 4 && grid[r-1][c].n === 1){
-				let next = r-1;
-				while(next >= 1 && grid[next-1][c].n === 1) next--;
-				grid[next][c].n = grid[r][c].n;
-				grid[r][c].n = 1;
-				flag = false;
-				console.log('move up', r, c, next, c, flag);
-			}
+	index = 1;
+	while(index < 4){
+		forward = index-1;
+		while(forward >= 0 && line[forward].n === 1){
+			line[forward].n = line[forward+1].n;
+			line[forward+1].n = 1;
+			forward --;
+		}
+		index ++;
+	}
+	
+	if(line[0].n === line[1].n && line[0].n > 1){
+		line[0].n *= 2;
+		line[1].n = 1;
+		// score += 2 ** line[1];
+	}
+	if(line[1].n === line[2].n && line[1].n > 1){
+		line[1].n *= 2;
+		line[2].n = 1;
+		// score += 2 ** line[1];
+	}
+	if(line[2].n === line[3].n && line[2].n > 1){
+		line[2].n *= 2;
+		line[3].n = 1;
+		// score += 2 ** line[2];
+	}
+	for(let i = 1; i <= 2; i++){
+		if(line[i].n === 1){
+			[line[i].n, line[i+1].n] = [line[i+1].n, 1];
 		}
 	}
-	flag || newTile();
-	render();
+	if(reverse){
+		line = [line[3], line[2], line[1], line[0]];
+	}
+	return line;
 }
 
-function down(){
-	var flag = true;
-	for(var r = 3; r >= 0; r--){
-		for(var c = 0; c < 4; c++){		
-			console.log('scan', r, c);
-			if(grid[r][c].n === 1) continue;
-			//move
-			if(r >= 0 && r <= 2 && grid[r+1][c].n === 1){
-				let next = r+1;
-				while(next <= 2 && grid[next+1][c].n === 1) next++;
-				grid[next][c].n = grid[r][c].n;
-				grid[r][c].n = 1;
-				flag = false;
-				console.log('move down', r, c, next, c, flag);
-			}
-			// merge
-			if(r > 0 && grid[r][c].n === grid[r-1][c].n){
-				grid[r][c].n *= 2;
-				grid[r-1][c].n = 1;
-				flag = false;
-				console.log('merge', r , c, flag);
-			}
-			//move
-			if(r >= 0 && r <= 2 && grid[r+1][c].n === 1){
-				let next = r+1;
-				while(next <= 2 && grid[next+1][c].n === 1) next++;
-				grid[next][c].n = grid[r][c].n;
-				grid[r][c].n = 1;
-				flag = false;
-				console.log('move down', r, c, next, c, flag);
-			}
+function moveall(drc){
+	if(drc === 0){
+		for(i in [1, 2, 3, 4]){
+			[grid[0][i], grid[1][i], grid[2][i], grid[3][i]] = 
+				movealine([grid[0][i], grid[1][i], grid[2][i], grid[3][i]],false);
 		}
+		return;
 	}
-	flag || newTile();
-	render();
-}
-
-function left(){
-	var flag = true;
-	for(var c = 0; c < 4; c++){		
-		for(var r = 0; r < 4; r++){
-			console.log('scan', r, c);
-			if(grid[r][c].n === 1) continue;
-			// move
-			if(c > 0 && grid[r][c-1].n === 1){
-				let next = c-1;
-				while(next >= 1 && grid[r][next-1].n === 1) next--;
-				grid[r][next].n = grid[r][c].n;
-				grid[r][c].n = 1;
-				flag = false;
-				console.log('left up', r, c, r, next, flag);
-			}
-			console.log(grid);
-			// merge
-			if(c < 3 && grid[r][c].n === grid[r][c+1].n){
-				grid[r][c].n *= 2;
-				grid[r][c+1].n = 1;
-				flag = false;
-				console.log('merge', r , c, flag);
-			}
-			console.log(grid);
-			// move
-			if(c > 0 && c < 4 && grid[r][c-1].n === 1){
-				let next = c-1;
-				while(next >= 1 && grid[r][next-1].n === 1) next--;
-				grid[r][next].n = grid[r][c].n;
-				grid[r][c].n = 1;
-				flag = false;
-				console.log('left up', r, c, r, next, flag);
-			}
-			console.log(grid);
+	if(drc === 1){
+		for(i in [1, 2, 3, 4]){
+			[grid[0][i], grid[1][i], grid[2][i], grid[3][i]] = 
+				movealine([grid[0][i], grid[1][i], grid[2][i], grid[3][i]],true);
 		}
+		return;
 	}
-	flag || newTile();
-	render();
-}
-
-function right(){
-	var flag = true;
-	for(var c = 3; c >= 0; c--){		
-		for(var r = 0; r < 4; r++){
-			console.log('scan', r, c);
-			if(grid[r][c].n === 1) continue;
-			// move
-			if(c >= 0 && c <= 2 && grid[r][c+1].n === 1){
-				let next = c+1;
-				while(next <= 2 && grid[r][next+1].n === 1) next++;
-				grid[r][next].n = grid[r][c].n;
-				grid[r][c].n = 1;
-				flag = false;
-				console.log('move right', r, c, r, next, flag);
-			}
-			// merge
-			if(c > 0 && grid[r][c].n === grid[r][c-1].n){
-				grid[r][c].n *= 2;
-				grid[r][c-1].n = 1;
-				flag = false;
-				console.log('merge', r , c, flag);
-			}
-			// move
-			if(c >= 0 && c <= 2 && grid[r][c+1].n === 1){
-				let next = c+1;
-				while(next <= 2 && grid[r][next+1].n === 1) next++;
-				grid[r][next].n = grid[r][c].n;
-				grid[r][c].n = 1;
-				flag = false;
-				console.log('move right', r, c, r, next, flag);
-			}
+	if(drc === 2){
+		for(i in [1, 2, 3, 4]){
+			[grid[i][0], grid[i][1], grid[i][2], grid[i][3]] = 
+				movealine([grid[i][0], grid[i][1], grid[i][2], grid[i][3]],false);
 		}
+		return;
 	}
-	flag || newTile();
-	render();
+	if(drc === 3){
+		for(i in [1, 2, 3, 4]){
+			console.log('i: ', i);
+			console.log('before', [grid[i][0], grid[i][1], grid[i][2], grid[i][3]]);
+			console.log('after', movealine([grid[i][0], grid[i][1], grid[i][2], grid[i][3]]));
+			[grid[i][0], grid[i][1], grid[i][2], grid[i][3]] = 
+				movealine([grid[i][0], grid[i][1], grid[i][2], grid[i][3]],true);
+		}
+		return;
+	}
 }
 
 function init(){
